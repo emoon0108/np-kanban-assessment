@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NextPlay Board</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Workspace navigation">
+        <div class="brand">
+          <div class="brand-mark">N</div>
+          <div>
+            <p class="eyebrow">NextPlay</p>
+            <h1>Task Board</h1>
+          </div>
+        </div>
+
+        <section class="summary-panel" aria-label="Board summary">
+          <div>
+            <span>Total</span>
+            <strong id="totalTasks">0</strong>
+          </div>
+          <div>
+            <span>Done</span>
+            <strong id="doneTasks">0</strong>
+          </div>
+          <div>
+            <span>Overdue</span>
+            <strong id="overdueTasks">0</strong>
+          </div>
+        </section>
+
+        <section class="team-panel" aria-label="Team members">
+          <div class="section-heading">
+            <h2>Team</h2>
+            <button class="icon-button" id="openMemberModal" type="button" title="Add member" aria-label="Add member">+</button>
+          </div>
+          <div class="member-list" id="memberList"></div>
+        </section>
+
+        <section class="status-note" id="connectionStatus" aria-live="polite"></section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Guest workspace</p>
+            <h2>Launch pipeline</h2>
+          </div>
+          <div class="toolbar">
+            <label class="search-field">
+              <span>Search</span>
+              <input id="searchInput" type="search" placeholder="Task title, label, assignee..." />
+            </label>
+            <select id="priorityFilter" aria-label="Filter by priority">
+              <option value="all">All priorities</option>
+              <option value="high">High</option>
+              <option value="normal">Normal</option>
+              <option value="low">Low</option>
+            </select>
+            <select id="assigneeFilter" aria-label="Filter by assignee">
+              <option value="all">All assignees</option>
+            </select>
+            <select id="labelFilter" aria-label="Filter by label">
+              <option value="all">All labels</option>
+            </select>
+            <button class="primary-button" id="openTaskModal" type="button">New task</button>
+          </div>
+        </header>
+
+        <div class="loading-banner" id="loadingBanner">Loading your guest board...</div>
+        <div class="error-banner" id="errorBanner" role="alert"></div>
+
+        <section class="board" id="board" aria-label="Kanban task board"></section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="taskModal" aria-hidden="true">
+      <form class="modal" id="taskForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Task</p>
+            <h2 id="taskModalTitle">Create task</h2>
+          </div>
+          <button class="ghost-button" type="button" data-close-modal>Close</button>
+        </div>
+        <input type="hidden" id="taskId" />
+        <label>
+          <span>Title</span>
+          <input id="taskTitle" required maxlength="120" placeholder="Write the next clear step" />
+        </label>
+        <label>
+          <span>Description</span>
+          <textarea id="taskDescription" rows="4" placeholder="Add useful context, acceptance notes, or blockers"></textarea>
+        </label>
+        <div class="form-grid">
+          <label>
+            <span>Status</span>
+            <select id="taskStatus"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="taskPriority">
+              <option value="low">Low</option>
+              <option value="normal" selected>Normal</option>
+              <option value="high">High</option>
+            </select>
+          </label>
+          <label>
+            <span>Due date</span>
+            <input id="taskDueDate" type="date" />
+          </label>
+          <label>
+            <span>Assignee</span>
+            <select id="taskAssignee"></select>
+          </label>
+        </div>
+        <label>
+          <span>Labels</span>
+          <input id="taskLabels" placeholder="Bug, Feature, Design" />
+        </label>
+        <div class="modal-actions">
+          <button class="danger-button" id="deleteTaskButton" type="button">Delete</button>
+          <button class="primary-button" type="submit">Save task</button>
+        </div>
+        <section class="detail-panel" id="taskCollaborationPanel">
+          <div>
+            <h3>Comments</h3>
+            <div class="comment-list" id="commentList"></div>
+            <div class="comment-composer">
+              <input id="commentInput" placeholder="Add a comment" />
+              <button class="ghost-button" id="addCommentButton" type="button">Add</button>
+            </div>
+          </div>
+          <div>
+            <h3>Activity</h3>
+            <div class="activity-list" id="activityList"></div>
+          </div>
+        </section>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="memberModal" aria-hidden="true">
+      <form class="modal compact-modal" id="memberForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Team</p>
+            <h2>Add member</h2>
+          </div>
+          <button class="ghost-button" type="button" data-close-modal>Close</button>
+        </div>
+        <label>
+          <span>Name</span>
+          <input id="memberName" required maxlength="60" placeholder="Avery Johnson" />
+        </label>
+        <label>
+          <span>Color</span>
+          <input id="memberColor" type="color" value="#2563eb" />
+        </label>
+        <button class="primary-button" type="submit">Add member</button>
+      </form>
+    </div>
+
+    <template id="emptyColumnTemplate">
+      <div class="empty-state">
+        <strong>No tasks here</strong>
+        <span>Drop work into this lane when it is ready.</span>
+      </div>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

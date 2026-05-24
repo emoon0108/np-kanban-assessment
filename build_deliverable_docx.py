@@ -89,8 +89,8 @@ add_heading(doc, "Links")
 add_bullets(
     doc,
     [
-        "Live frontend app: TODO - paste the deployed Vercel, Netlify, or Cloudflare Pages URL.",
-        "GitHub repository: TODO - paste the public or shared private repository URL.",
+        "Live frontend app: https://np-kanban-assessment.vercel.app",
+        "GitHub repository: https://github.com/emoon0108/np-kanban-assessment",
     ],
 )
 

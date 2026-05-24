@@ -6,11 +6,11 @@ NextPlay Task Board is a responsive Kanban-style task manager built as a static 
 
 ## Live Frontend App
 
-TODO: Paste the deployed Vercel, Netlify, or Cloudflare Pages URL here.
+https://np-kanban-assessment.vercel.app
 
 ## GitHub Repository
 
-TODO: Paste the public or shared private GitHub repository URL here.
+https://github.com/emoon0108/np-kanban-assessment
 
 ## Design Decisions
 

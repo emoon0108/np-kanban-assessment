@@ -2,6 +2,8 @@
 
 A polished Kanban-style task board for the Next Play Games software development assessment. It supports anonymous guest sessions with Supabase, row-level security, task creation/editing/deletion, drag-and-drop status updates, assignees, labels, search, priority filtering, due-date indicators, and board stats.
 
+Live app: https://np-kanban-assessment.vercel.app
+
 ## Features
 
 - Four default lanes: To Do, In Progress, In Review, Done

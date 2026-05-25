@@ -313,9 +313,10 @@ function renderMembers() {
 
 function renderAssigneeOptions() {
   els.taskAssignee.innerHTML = [
-    `<option value="">Unassigned</option>`,
+    `<option value="">${state.members.length ? "Unassigned" : "Add a teammate first"}</option>`,
     ...state.members.map((member) => `<option value="${member.id}">${escapeHtml(member.name)}</option>`),
   ].join("");
+  els.taskAssignee.disabled = !state.members.length;
 }
 
 function renderBoardFilters() {
@@ -745,7 +746,7 @@ function openTaskModal(id = "") {
   els.taskStatus.value = task?.status || "todo";
   els.taskPriority.value = task?.priority || "normal";
   els.taskDueDate.value = task?.due_date || "";
-  els.taskAssignee.value = task?.assignee_id || "";
+  els.taskAssignee.value = task?.assignee_id || (!task && state.members[0]?.id) || "";
   els.taskLabels.value = normalizeLabels(task?.labels).join(", ");
   els.taskCollaborationPanel.style.display = task ? "grid" : "none";
   if (task) renderTaskDetails(task.id);

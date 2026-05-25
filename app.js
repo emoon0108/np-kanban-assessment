@@ -1,5 +1,5 @@
-const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://zyqqrrdohfygphxtphbx.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Y3C0-g69UiBiF1HxduxCJw_rx4s7Yfg";
 
 const COLUMNS = [
   { id: "todo", title: "To Do", color: "#6b7280" },

@@ -139,15 +139,26 @@ function isSupabaseConfigured() {
 }
 
 async function signInGuest() {
-  const { data: sessionData } = await supabaseClient.auth.getSession();
-  if (sessionData.session?.user) {
-    state.user = sessionData.session.user;
-    return;
+  const { data: userData } = await supabaseClient.auth.getUser();
+  if (userData.user) {
+    state.user = userData.user;
+    return state.user;
   }
 
   const { data, error } = await supabaseClient.auth.signInAnonymously();
   if (error) throw error;
   state.user = data.user;
+  return state.user;
+}
+
+async function ensureGuestUser() {
+  if (!state.usingSupabase) return null;
+  const { data } = await supabaseClient.auth.getUser();
+  if (data.user) {
+    state.user = data.user;
+    return state.user;
+  }
+  return signInGuest();
 }
 
 async function loadTasks() {
@@ -458,7 +469,8 @@ async function handleTaskSubmit(event) {
 
 async function createTask(task) {
   if (state.usingSupabase) {
-    const payload = { ...task, user_id: state.user.id };
+    const user = await ensureGuestUser();
+    const payload = { ...task, user_id: user.id };
     const { data, error } = await supabaseClient.from("tasks").insert(payload).select().single();
     if (error) throw error;
     state.tasks.push(data);
@@ -515,9 +527,10 @@ async function handleCommentSubmit() {
 
   try {
     if (state.usingSupabase) {
+      const user = await ensureGuestUser();
       const { data, error } = await supabaseClient
         .from("task_comments")
-        .insert({ task_id: taskId, body, user_id: state.user.id })
+        .insert({ task_id: taskId, body, user_id: user.id })
         .select()
         .single();
       if (error) throw error;
@@ -546,9 +559,10 @@ async function createActivity(taskId, message) {
   };
 
   if (state.usingSupabase) {
+    const user = await ensureGuestUser();
     const { data, error } = await supabaseClient
       .from("task_activity")
-      .insert({ ...activity, user_id: state.user.id })
+      .insert({ ...activity, user_id: user.id })
       .select()
       .single();
     if (error) throw error;
@@ -597,9 +611,10 @@ async function handleMemberSubmit(event) {
 
   try {
     if (state.usingSupabase) {
+      const user = await ensureGuestUser();
       const { data, error } = await supabaseClient
         .from("team_members")
-        .insert({ ...member, user_id: state.user.id })
+        .insert({ ...member, user_id: user.id })
         .select()
         .single();
       if (error) throw error;
